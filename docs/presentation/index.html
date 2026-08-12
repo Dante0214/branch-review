@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>branch-review — 3주차 미니 프로젝트</title>
+<style>
+  :root {
+    --ink: #16181d;
+    --ink-2: #4a4f57;
+    --ink-3: #7d838d;
+    --line: #dfe2e7;
+    --bg: #ffffff;
+    --bg-2: #f6f7f9;
+    --red: #c0392b;
+    --blue: #1f5fbf;
+    --green: #1e7a4c;
+    --amber: #b07800;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: #8b8f96;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+  }
+
+  .slide {
+    position: relative;
+    width: 338mm;
+    height: 190mm;
+    padding: 18mm 20mm;
+    margin: 8mm auto;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2mm 8mm rgba(0,0,0,.25);
+  }
+
+  .num {
+    position: absolute;
+    right: 20mm; bottom: 10mm;
+    font-size: 4mm;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eyebrow {
+    font-size: 4.4mm;
+    font-weight: 600;
+    color: var(--blue);
+    letter-spacing: .02em;
+    margin-bottom: 3mm;
+  }
+
+  h1 { font-size: 17mm; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+  h2 { font-size: 10mm; font-weight: 700; letter-spacing: -.015em; line-height: 1.2; margin-bottom: 8mm; }
+  h3 { font-size: 6mm; font-weight: 700; margin-bottom: 3mm; }
+
+  p, li { font-size: 5.4mm; line-height: 1.65; color: var(--ink-2); }
+  strong { color: var(--ink); font-weight: 700; }
+
+  .lead { font-size: 7mm; line-height: 1.5; color: var(--ink); font-weight: 500; }
+  .sub { font-size: 5mm; color: var(--ink-3); margin-top: 4mm; }
+
+  ul { list-style: none; }
+  li { position: relative; padding-left: 6mm; margin-bottom: 3mm; }
+  li::before {
+    content: '';
+    position: absolute; left: 0; top: 3.2mm;
+    width: 2mm; height: 2mm; border-radius: 50%;
+    background: var(--ink-3);
+  }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12mm; flex: 1; }
+  .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8mm; }
+
+  .card {
+    border: .4mm solid var(--line);
+    border-radius: 2mm;
+    padding: 7mm;
+    background: var(--bg-2);
+  }
+  .card.plain { background: var(--bg); }
+  .card h3 { font-size: 5.6mm; }
+  .card p, .card li { font-size: 4.8mm; line-height: 1.55; }
+
+  .accent-red   { border-left: 1.6mm solid var(--red); }
+  .accent-blue  { border-left: 1.6mm solid var(--blue); }
+  .accent-green { border-left: 1.6mm solid var(--green); }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 2mm; }
+  th, td {
+    text-align: left; padding: 3.4mm 4mm;
+    border-bottom: .3mm solid var(--line);
+    font-size: 4.9mm; line-height: 1.45;
+  }
+  th { font-weight: 700; color: var(--ink); font-size: 4.6mm; }
+  td { color: var(--ink-2); }
+  td strong { color: var(--ink); }
+
+  code, .mono {
+    font-family: 'JetBrains Mono', 'D2Coding', Consolas, monospace;
+    font-size: .92em;
+    background: #eef0f3;
+    padding: .4mm 1.4mm;
+    border-radius: 1mm;
+    color: var(--ink);
+  }
+
+  pre {
+    background: #1c1f26;
+    color: #e6e8ec;
+    border-radius: 2mm;
+    padding: 6mm;
+    font-family: 'JetBrains Mono', 'D2Coding', Consolas, monospace;
+    font-size: 4.4mm;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+  pre code { background: none; padding: 0; color: inherit; }
+  .c-red { color: #ff8a80; }
+  .c-blue { color: #82b1ff; }
+  .c-green { color: #a5e8b0; }
+  .c-dim { color: #8b929e; }
+
+  .tag {
+    display: inline-block;
+    font-size: 4.2mm; font-weight: 700;
+    padding: 1mm 2.6mm; border-radius: 1.2mm;
+    margin-right: 2mm;
+  }
+  .tag-req { background: #fbe9e7; color: var(--red); }
+  .tag-rec { background: #fff4e0; color: var(--amber); }
+  .tag-sug { background: #e8f0fe; color: var(--blue); }
+
+  .big-num { font-size: 14mm; font-weight: 800; line-height: 1; color: var(--ink); }
+  .stat-label { font-size: 4.4mm; color: var(--ink-3); margin-top: 2mm; }
+
+  .flow {
+    display: flex; align-items: center; gap: 4mm;
+    margin: 6mm 0;
+  }
+  .flow-box {
+    flex: 1; text-align: center;
+    border: .4mm solid var(--line); border-radius: 2mm;
+    padding: 5mm 3mm; background: var(--bg-2);
+    font-size: 4.8mm; font-weight: 600; color: var(--ink);
+  }
+  .flow-arrow { color: var(--ink-3); font-size: 6mm; }
+
+  .center { justify-content: center; }
+  .divider { height: .3mm; background: var(--line); margin: 6mm 0; }
+
+  @media print {
+    body { background: none; }
+    .slide { margin: 0; box-shadow: none; page-break-after: always; }
+    .slide:last-child { page-break-after: auto; }
+    @page { size: 338mm 190mm; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide center">
+  <div class="eyebrow">3주차 미니 프로젝트 · 코드 리뷰 도구</div>
+  <h1>branch-review</h1>
+  <p class="lead" style="margin-top:8mm; max-width:230mm;">
+    팀 컨벤션을 먼저 보는 코드 리뷰 도구.<br>
+    <strong>규칙 위반</strong>과 <strong>리뷰어 취향</strong>을 같은 칸에 넣지 않는다.
+  </p>
+  <p class="sub">안치호 · Claude Code 플러그인</p>
+  <div class="num">1</div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="eyebrow">문제</div>
+  <h2>AI 리뷰 도구는 우리 팀 규칙을 모른다</h2>
+
+  <p style="margin-bottom:7mm;">팀 프로젝트 Pulse는 두 레포 모두 CodeRabbit을 붙여 두었다. 그런데 리뷰를 받아 보면 이런 것들이 섞여 온다.</p>
+
+  <div class="cols-3">
+    <div class="card accent-red">
+      <h3>이미 해결된 것을 지적</h3>
+      <p>세미콜론·따옴표 — Prettier가 저장할 때 이미 고친다</p>
+    </div>
+    <div class="card accent-red">
+      <h3>팀 결정과 반대로 지적</h3>
+      <p><code>interface</code> 대신 <code>type</code>을 쓰라고 함 — 팀은 props에 <code>interface</code>로 정했다</p>
+    </div>
+    <div class="card accent-red">
+      <h3>진짜 위반은 통과</h3>
+      <p>컨트롤러에 로직이 들어간 것 — 팀이 금지한 항목인데 모른다</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <p class="lead">원인은 하나다. <strong>기준이 팀 밖에 있다.</strong></p>
+  <div class="num">2</div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="eyebrow">문제</div>
+  <h2>더 나쁜 것 — 지적의 무게가 전부 같아 보인다</h2>
+
+  <div class="cols">
+    <div>
+      <pre><code><span class="c-dim">// 리뷰 결과</span>
+
+- <span class="c-red">any 타입을 쓰지 마세요</span>
+- 변수명을 더 명확하게
+- <span class="c-red">컨트롤러에 로직이 있습니다</span>
+- 세미콜론 누락
+- 이 함수는 분리하는 게 좋습니다
+- 주석을 추가해 주세요</code></pre>
+      <p class="sub">협상 불가능한 규칙 위반과 취향이 나란히 있다</p>
+    </div>
+    <div style="display:flex; flex-direction:column; justify-content:center;">
+      <p class="lead" style="margin-bottom:6mm;">받는 쪽은 둘을 구분할 방법이 없다.</p>
+      <p>그래서 <strong>전부 "참고 의견"으로 읽고 넘긴다.</strong></p>
+      <p style="margin-top:4mm;">진짜 규칙 위반까지 같이 묻힌다.</p>
+    </div>
+  </div>
+  <div class="num">3</div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="eyebrow">해결</div>
+  <h2>근거의 출처로 두 층을 나눈다</h2>
+
+  <table>
+    <tr>
+      <th style="width:26%"></th>
+      <th style="width:37%">1차 — 컨벤션 위반</th>
+      <th style="width:37%">2차 — 개선 제안</th>
+    </tr>
+    <tr>
+      <td><strong>근거</strong></td>
+      <td>팀이 문서로 합의한 규칙</td>
+      <td>일반적인 통념</td>
+    </tr>
+    <tr>
+      <td><strong>인용</strong></td>
+      <td>문서 원문 그대로</td>
+      <td>실패 시나리오</td>
+    </tr>
+    <tr>
+      <td><strong>반박 방법</strong></td>
+      <td>문서를 고친다</td>
+      <td>다르게 판단하면 된다</td>
+    </tr>
+    <tr>
+      <td><strong>표기</strong></td>
+      <td><span class="tag tag-req">필수</span><span class="tag tag-rec">권장</span></td>
+      <td><span class="tag tag-sug">제안</span></td>
+    </tr>
+  </table>
+
+  <div class="divider"></div>
+  <p class="lead">이 구분이 도구의 전부다. 나머지는 이 구분을 지키기 위한 장치다.</p>
+  <div class="num">4</div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="eyebrow">리뷰 기준 선정</div>
+  <h2>기준을 새로 만들지 않고, 팀 문서를 승격시켰다</h2>
+
+  <p style="margin-bottom:6mm;">Pulse 팀은 이미 <code>CLAUDE.md</code>에 커밋 형식·브랜치 네이밍·금지 문법·레이어 분리를 문장으로 적어 두었다. 새 규칙 문서를 만들면 둘 중 어느 것이 진짜인지 아무도 모르게 된다.</p>
+
+  <table>
+    <tr><th style="width:12%">순위</th><th style="width:38%">파일</th><th>역할</th></tr>
+    <tr>
+      <td><strong>1</strong></td>
+      <td><code>.claude/review-rules.md</code></td>
+      <td>리뷰 전용 규칙. 강도를 따로 조정할 때만 만든다</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td><code>CLAUDE.md</code> · <code>AGENTS.md</code></td>
+      <td>이미 있는 프로젝트 문서에서 추출</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td><code>.prettierrc</code> · ESLint · Spotless</td>
+      <td><strong>지적하지 말아야 할 것</strong>의 목록</td>
+    </tr>
+  </table>
+
+  <p style="margin-top:6mm;">3번이 덜 뻔하다. 포매터가 자동으로 고치는 항목을 사람에게 시키면 <strong>리포트 전체가 소음으로 읽힌다.</strong></p>
+  <div class="num">5</div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="eyebrow">리뷰 기준 선정</div>
+  <h2>판정 가능한 문장만 규칙으로 쓴다</h2>
+
+  <p style="margin-bottom:6mm;">문서의 모든 문장이 규칙은 아니다. 기준은 하나 — <strong>코드만 보고 O/X를 낼 수 있는가.</strong></p>
+
+  <div class="cols">
+    <div class="card accent-green">
+      <h3 style="color:var(--green)">규칙이다</h3>
+      <ul>
+        <li><code>any</code> 금지, 불가피하면 <code>unknown</code> + 좁히기</li>
+        <li>import는 절대경로 <code>@/</code>, <code>../../</code> 금지</li>
+        <li>컨트롤러에 비즈니스 로직 금지</li>
+        <li>엔티티를 응답에 직접 노출 금지</li>
+      </ul>
+    </div>
+    <div class="card accent-red">
+      <h3 style="color:var(--red)">규칙이 아니다</h3>
+      <ul>
+        <li>가독성 좋게 작성한다</li>
+        <li>적절히 분리한다</li>
+        <li>성능을 고려한다</li>
+      </ul>
+      <p style="margin-top:4mm; color:var(--ink-3)">판정할 수 없으면 1차에서 뺀다. 실제 문제를 찾았다면 2차로 낸다.</p>
+    </div>
+  </div>
+  <div class="num">6</div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="eyebrow">구조</div>
+  <h2>스크립트는 사실만 모으고, 판단은 문서가 정한다</h2>
+
+  <div class="flow">
+    <div class="flow-box">collect.sh<br><span style="font-weight:400; color:var(--ink-3); font-size:4.2mm">diff · 커밋 · 기준파일 위치</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">기준 문서 읽기<br><span style="font-weight:400; color:var(--ink-3); font-size:4.2mm">CLAUDE.md · 도구 설정</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">판정<br><span style="font-weight:400; color:var(--ink-3); font-size:4.2mm">criteria.md 절차</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">리포트<br><span style="font-weight:400; color:var(--ink-3); font-size:4.2mm">4부 고정 구조</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="cols">
+    <div>
+      <h3>규칙을 도구에 넣지 않은 이유</h3>
+      <p>규칙이 플러그인 안에 있으면 팀마다 플러그인을 고쳐야 하고, 규칙이 바뀔 때마다 재배포해야 한다. 규칙은 팀 레포에 두고 도구는 읽기만 한다.</p>
+    </div>
+    <div>
+      <h3>스크립트가 판단하지 않는 이유</h3>
+      <p>"이 유틸이 이미 있는가"를 알려면 레포를 검색해야 한다. <code>CLAUDE.md</code>의 자연어 규칙은 정규식으로 옮길 수 없다.</p>
+    </div>
+  </div>
+  <div class="num">7</div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="eyebrow">실제 적용</div>
+  <h2>팀 브랜치에 그대로 돌렸다</h2>
+
+  <pre><code><span class="c-dim">$</span> cd pulse-frontend
+<span class="c-dim">$</span> /branch-review:review
+
+<span class="c-blue">== TARGET ==</span>
+branch:  feature/30-live-result-page
+base:    origin/dev (자동 탐지)
+
+<span class="c-blue">== CONVENTION SOURCES ==</span>
+  [폴백]     CLAUDE.md
+  [도구설정] .prettierrc  eslint.config.mjs  .githooks/commit-msg</code></pre>
+
+  <div class="cols-3" style="margin-top:8mm;">
+    <div class="card plain"><div class="big-num">6</div><div class="stat-label">변경 파일</div></div>
+    <div class="card plain"><div class="big-num">+405</div><div class="stat-label">추가된 줄</div></div>
+    <div class="card plain"><div class="big-num">12</div><div class="stat-label">커밋</div></div>
+  </div>
+  <div class="num">8</div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="eyebrow">실제 적용 · 결과</div>
+  <h2>사람이 못 본 두 가지를 찾았다</h2>
+
+  <div class="card accent-blue" style="margin-bottom:6mm;">
+    <h3><span class="tag tag-sug">제안</span> <code>?submitted=1</code>이 URL에 영구히 남는다</h3>
+    <p>배너를 떼는 코드가 레포에 없다(<code>router.replace</code> 사용처 0). 링크를 저장했다 다시 열면 "소감이 등록되었어요"가 또 뜬다.</p>
+    <p style="margin-top:3mm;"><strong>정작 같은 파일 주석이</strong> "며칠 뒤 다시 열었을 때 안내가 뜨면 안 된다"는 이유로 이 방식을 골랐다고 적고 있다. <strong>의도와 구현이 어긋난 경우다.</strong></p>
+  </div>
+
+  <div class="card accent-blue">
+    <h3><span class="tag tag-sug">제안</span> <code>h1</code> 다음이 바로 <code>h3</code></h3>
+    <p>커밋 본문에 "heading order를 정리했다"고 적혀 있는데 <code>h2</code>가 없다. axe <code>heading-order</code> 위반이다. <strong>커밋 메시지의 주장과 실제 코드가 어긋난 경우다.</strong></p>
+  </div>
+  <div class="num">9</div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="eyebrow">실제 적용 · 결과</div>
+  <h2>지적하지 않은 것이 리포트를 짧게 만든다</h2>
+
+  <div class="cols">
+    <div>
+      <h3>리포트에서 빠진 것</h3>
+      <ul>
+        <li>커밋 12개의 형식 — <code>.githooks/commit-msg</code>가 이미 강제한다</li>
+        <li>따옴표·세미콜론·줄바꿈 — Prettier가 관리한다</li>
+        <li>import 정렬 — ESLint 규칙이 있다</li>
+      </ul>
+      <p style="margin-top:4mm;">지적할 수 있었지만 하지 않았다.</p>
+    </div>
+    <div>
+      <h3>최종 결과</h3>
+      <table>
+        <tr><td><span class="tag tag-req">필수</span></td><td><strong>0건</strong></td></tr>
+        <tr><td><span class="tag tag-rec">권장</span></td><td><strong>1건</strong> — 공개 페이지 SSR 원칙</td></tr>
+        <tr><td><span class="tag tag-sug">제안</span></td><td><strong>3건</strong> — 접근성·상태 관리</td></tr>
+      </table>
+      <p style="margin-top:5mm;">405줄 추가에 지적 4건. <strong>이 브랜치는 실제로 컨벤션을 잘 지켰다.</strong> 건수를 채웠다면 리포트 전체의 신뢰가 깎였을 것이다.</p>
+    </div>
+  </div>
+  <div class="num">10</div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="eyebrow">설계 원칙</div>
+  <h2>안 하기로 정한 것들</h2>
+
+  <table>
+    <tr><th style="width:38%">원칙</th><th>막는 것</th></tr>
+    <tr>
+      <td><strong>읽지 않은 코드는 리뷰하지 않는다</strong></td>
+      <td>diff가 1500줄에서 잘리면 생략된 파일명을 남긴다. 잘린 자리를 추측으로 메우면 없는 결함을 지어낸다</td>
+    </tr>
+    <tr>
+      <td><strong>근거 없는 지적은 버린다</strong></td>
+      <td>문서 인용도 못 하고 실패 시나리오도 못 대면 그건 취향이다</td>
+    </tr>
+    <tr>
+      <td><strong>건수를 채우지 않는다</strong></td>
+      <td>깨끗하면 "위반 없음"이 정답이다. 억지 지적 하나가 진짜 지적 열 개의 신뢰를 깎는다</td>
+    </tr>
+    <tr>
+      <td><strong>파일을 수정하지 않는다</strong></td>
+      <td>읽기 전용. 사용자가 따로 요청할 때만 고친다</td>
+    </tr>
+    <tr>
+      <td><strong>정적 분석을 재구현하지 않는다</strong></td>
+      <td>ESLint·Spotless가 하는 일을 다시 하지 않는다</td>
+    </tr>
+  </table>
+  <div class="num">11</div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="eyebrow">확장</div>
+  <h2>리뷰가 팀 규칙을 갱신한다</h2>
+
+  <div class="flow">
+    <div class="flow-box">리뷰 반복</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box"><span class="tag tag-sug">제안</span>에 같은 항목이<br>세 번 나옴</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box"><code>.claude/review-rules.md</code>에<br>한 줄 추가</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">다음부터<br><span class="tag tag-rec">권장</span>으로 승격</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <p class="lead" style="margin-bottom:5mm;">2차에서 반복되는 항목은 <strong>팀이 아직 말로만 공유하고 문서화하지 않은 규칙</strong>이라는 신호다.</p>
+  <p>도구의 최종 목적은 지적을 많이 하는 것이 아니라, 팀 규칙을 실제로 쓰이는 상태로 유지하는 것이다. 이 고리가 도는 팀에서 리뷰는 지적 도구가 아니라 합의 도구가 된다.</p>
+  <div class="num">12</div>
+</section>
+
+<!-- 13 -->
+<section class="slide center">
+  <div class="eyebrow">정리</div>
+  <h2 style="font-size:13mm; margin-bottom:10mm;">기준이 팀 안에 있으면<br>리뷰가 협상 도구가 된다</h2>
+
+  <div class="cols-3">
+    <div class="card plain accent-green">
+      <h3>기준</h3>
+      <p>팀 <code>CLAUDE.md</code>를 그대로 승격. 판정 가능한 문장만 사용</p>
+    </div>
+    <div class="card plain accent-green">
+      <h3>구조</h3>
+      <p>근거의 출처로 두 층 분리. 4부 고정 리포트</p>
+    </div>
+    <div class="card plain accent-green">
+      <h3>실증</h3>
+      <p>팀 브랜치 405줄에서 의도와 구현이 어긋난 2건 발견</p>
+    </div>
+  </div>
+
+  <p class="sub" style="margin-top:10mm;">github.com/Dante0214/branch-review</p>
+  <div class="num">13</div>
+</section>
+
+</body>
+</html>
