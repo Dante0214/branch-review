@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# PATH 런처.
+#
+# Claude Code는 플러그인의 bin/ 디렉토리를 실행 환경 PATH에 자동으로 등록한다.
+# 그래서 CLAUDE_PLUGIN_ROOT가 비어 있는 환경에서도, 작업 디렉토리가 어디든
+# 이름만으로 수집기를 부를 수 있다. 스킬이 경로를 몰라도 되게 하는 것이 목적이다.
+#
+#   branch-review-collect --staged
+#   branch-review-collect -- src/main/java
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1
+exec bash "$ROOT/skills/review/scripts/collect.sh" "$@"

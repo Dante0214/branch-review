@@ -116,8 +116,9 @@ cp <플러그인경로>/skills/review/templates/review-rules.md .claude/review-r
 - `bash` — macOS·Linux 기본 탑재. Windows는 Git for Windows에 포함
 - 리뷰 기준이 될 문서 최소 하나 (`CLAUDE.md`면 충분)
 
-## 결과가 비어 있다면
+## 잘 동작하지 않는다면
 
+- **`No such file or directory`로 수집이 실패한다** — `CLAUDE_PLUGIN_ROOT`가 비어 있는 환경이다. 스킬이 PATH 런처(`branch-review-collect`)와 플러그인 캐시 경로를 차례로 시도하므로 대개 그대로 진행된다. 셋 다 실패하면 설치가 깨진 것이니 `/plugin`으로 재설치한다.
 - **변경 없음으로 나온다** — 비교 기준이 잘못 잡혔을 수 있다. `--files-only`로 `base`와 분기점을 확인하고, 필요하면 `--base`로 지정한다.
 - **기준 파일을 못 찾는다** — 레포 루트에서 실행했는지 확인한다. 스크립트는 `git rev-parse --show-toplevel` 기준으로 찾는다.
 - **diff가 잘린다** — 기본 상한 1500줄이다. `--max-lines`를 올리거나 `-- <경로>`로 범위를 좁힌다. 리뷰는 한 번에 좁은 범위를 보는 편이 정확하다.

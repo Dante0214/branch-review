@@ -17,8 +17,15 @@ description: Review the changed files on the current branch against the team's o
 ### 1. 수집
 
 ```bash
-bash "${CLAUDE_PLUGIN_ROOT}/skills/review/scripts/collect.sh"
+COLLECT="${CLAUDE_PLUGIN_ROOT}/skills/review/scripts/collect.sh"
+[ -f "$COLLECT" ] || COLLECT=$(command -v branch-review-collect)
+[ -f "$COLLECT" ] || COLLECT=$(ls -1d "$HOME"/.claude/plugins/cache/*/branch-review/*/skills/review/scripts/collect.sh 2>/dev/null | tail -1)
+[ -f "$COLLECT" ] || { echo "!! 수집 스크립트를 찾지 못했습니다. /plugin 으로 재설치가 필요합니다."; exit 1; }
+
+bash "$COLLECT"
 ```
+
+`CLAUDE_PLUGIN_ROOT`가 비어 있는 환경이 있다. 그래서 폴백이 세 단계다 — 환경변수, PATH에 등록된 `branch-review-collect` 런처, 플러그인 캐시 경로 순. 위 블록을 통째로 실행하면 셋 중 하나가 걸린다. 플래그는 마지막 줄에 붙인다 (`bash "$COLLECT" --staged`).
 
 | 플래그 | 의미 |
 |---|---|
@@ -149,11 +156,13 @@ useEffect(() => {
 
 ## 규칙
 
+- **수집 스크립트를 찾아 헤매지 않는다.** 위 세 경로가 전부다. 셋 다 실패하면 플러그인 설치가 깨진 것이므로 `/plugin`으로 재설치하라고 알리고 멈춘다. 워크스페이스 전역 glob이나 `find /`로 뒤지는 것은 금지한다 — 리뷰 대상 레포 안에 플러그인 파일이 있을 리 없고, 시간만 버린다.
 - **읽지 않은 코드는 리뷰하지 않는다.** diff가 잘렸으면 파일을 열거나, 못 봤다고 밝힌다.
 - **근거 없는 지적은 버린다.** 팀 문서 인용도 못 하고 실패 시나리오도 못 대면 그건 취향이다.
 - **포매터·린터가 잡는 건 지적하지 않는다.** Prettier/ESLint/Spotless가 강제하는 항목은 이미 해결된 문제다.
 - **컨벤션이 침묵하는 곳에서 규칙을 지어내지 않는다.** 문서에 없으면 2차로 내리거나, 규칙 신설을 제안한다.
 - **잘 된 것도 한 줄 쓴다.** 총평에서. 지적만 나열된 리뷰는 다음번에 안 돌린다.
 - **파일을 수정하지 않는다.** 사용자가 명시적으로 요청할 때만 고친다.
+- **검증 명령을 임의로 돌리지 않는다.** `lint`/`test`/`build` 등은 `collect.sh`가 주는 diff·커밋 로그만으로 판정이 끝나지 않을 때조차, 사용자가 명시적으로 요청하지 않는 한 실행하지 않는다.
 - **지적 건수를 채우려 하지 않는다.** 깨끗하면 "위반 없음"이 정답이다. 억지로 만든 지적 하나가 진짜 지적 열 개의 신뢰를 깎는다.
 - 사용자 언어에 맞춘다.
