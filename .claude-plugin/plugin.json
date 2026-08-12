@@ -1,7 +1,7 @@
 {
   "name": "branch-review",
   "description": "Review the changed files on your current branch against your team's own conventions first, then against general best practice. Reports in a fixed four-part structure.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Dante0214",
     "url": "https://github.com/Dante0214"
