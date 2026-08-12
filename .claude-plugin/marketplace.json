@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "branch-review",
+  "description": "Convention-first code review for the current branch — team rules, then best practice.",
+  "owner": {
+    "name": "Dante0214",
+    "url": "https://github.com/Dante0214"
+  },
+  "plugins": [
+    {
+      "name": "branch-review",
+      "description": "Read the branch diff, check it against the team's documented conventions, then against general best practice. Fixed report structure: 변경점 요약 / 컨벤션 위반 / 개선 제안 / 총평.",
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}
